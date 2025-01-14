@@ -3,9 +3,17 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
+interface ArticlesProps {
+    id?: number;
+    title: string;
+    description: string;
+    body: string;
+    createdAt: string
+}
+
 export default function Articles() {
-    const [article, setArticle] = useState<any>({})
-    const [articles, setArticles] = useState<any>([])
+    const [article, setArticle] = useState<ArticlesProps>({ title: '', description: '', body: '', createdAt: '' });
+    const [articles, setArticles] = useState<ArticlesProps[]>([])
 
     useEffect(() => {
         getArticles()
@@ -25,11 +33,11 @@ export default function Articles() {
             },
             body: JSON.stringify(article),
         })
-            setArticle({})
             await getArticles()
     }
 
     async function updateArticle() {
+        if (!article.id) return;
         await fetch(`https://nestjs-backend-v9c5.onrender.com/articles/${article.id}`, {
             method: 'PATCH',
             headers: {
@@ -37,7 +45,6 @@ export default function Articles() {
             },
             body: JSON.stringify(article),
         })
-            setArticle({})
             await getArticles()
     }
 
@@ -105,7 +112,7 @@ export default function Articles() {
             <h1 className="flex items-center justify-center py-4 font-bold">Lista de artigos</h1>
             <div className="flex items-center justify-center w-full mx-auto max-w-7xl">  
                 <div className="flex flex-col gap-4 mx-2">
-                    {articles.map((article: any) => (
+                    {articles.map((article) => (
                         <div key={article.id} className="bg-zinc-900 p-4 rounded-md text-gray-500">
                             <h2 className="font-bold py-4 text-green-600">{article.title}</h2>
                             <p>{article.description}</p>
@@ -117,10 +124,10 @@ export default function Articles() {
                             </Link>
                             </button>
                             <div>
-                                <button onClick={() => deleteArticle(article.id)} className="bg-red-600 p-2 rounded-md text-white">Excluir artigo</button>
+                                <button onClick={() => deleteArticle(article.id!)} className="bg-red-600 p-2 rounded-md text-white">Excluir artigo</button>
                             </div>
                             <div>
-                                <button onClick={() => updateArticleById(article.id)} className="bg-zinc-800 p-2 rounded-md text-white">Editar artigo</button>
+                                <button onClick={() => updateArticleById(article.id!)} className="bg-zinc-800 p-2 rounded-md text-white">Editar artigo</button>
                             </div>
                             </div>
                         </div>
