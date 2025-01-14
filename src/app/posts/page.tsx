@@ -9,6 +9,7 @@ interface Article {
     title: string;
     description: string;
     body: string;
+    userId?: number;  // ID do usuário que criou o artigo
     createdAt?: string;
 }
 
@@ -19,8 +20,21 @@ export default function Articles() {
         body: '',
     });
     const [articles, setArticles] = useState<Article[]>([]);
+    const [userId, setUserId] = useState<number | null>(null);
+
+    // Função para obter o ID do usuário autenticado
+    function getUserIdFromToken() {
+        const token = localStorage.getItem("authToken");  // Supondo que o token esteja no localStorage
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1]));  // Decodifica o JWT
+            return payload.userId;  // Supondo que o JWT contenha o userId
+        }
+        return null;
+    }
 
     useEffect(() => {
+        const userId = getUserIdFromToken();
+        setUserId(userId);  // Define o userId do usuário autenticado
         getArticles();
     }, []);
 
@@ -28,7 +42,7 @@ export default function Articles() {
         try {
             const resp = await fetch('https://nestjs-backend-v9c5.onrender.com/articles');
             const articlesData: Article[] = await resp.json();
-            setArticles(articlesData);
+            setArticles(articlesData.filter(article => article.userId === userId));  // Filtra artigos do usuário
         } catch (error) {
             console.error("Erro ao buscar artigos:", error);
         }
@@ -36,12 +50,13 @@ export default function Articles() {
 
     async function createArticle() {
         try {
+            const newArticle = { ...article, userId };  // Inclui o userId ao criar o artigo
             await fetch('https://nestjs-backend-v9c5.onrender.com/articles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(article),
+                body: JSON.stringify(newArticle),
             });
             setArticle({ title: '', description: '', body: '' });
             await getArticles();
@@ -155,12 +170,14 @@ export default function Articles() {
                                     <button
                                         onClick={() => deleteArticle(article.id!)}
                                         className="bg-red-600 p-2 rounded-md text-white"
+                                        disabled={article.userId !== userId}  // Desabilita o botão se não for o artigo do usuário
                                     >
                                         Excluir artigo
                                     </button>
                                     <button
                                         onClick={() => updateArticleById(article.id!)}
                                         className="bg-zinc-800 p-2 rounded-md text-white"
+                                        disabled={article.userId !== userId}  // Desabilita o botão se não for o artigo do usuário
                                     >
                                         Editar artigo
                                     </button>

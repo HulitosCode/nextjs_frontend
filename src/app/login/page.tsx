@@ -12,7 +12,7 @@ const LoginPage = () => {
       const res = await fetch('https://nestjs-backend-v9c5.onrender.com/auth/login', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',  // Corrigido 'aplication/json' para 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
