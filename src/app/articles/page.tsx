@@ -11,7 +11,7 @@ export default async function Articles(){
         <div>
             <h1>Todos Artigos</h1> 
 
-            <div className="flex flex-col gap-4 mx-2">
+            {/* <div className="flex flex-col gap-4 mx-2">
                 {data.articles?.map(article => (
                     <div key={article.id} className="bg-gray-400 p-4 rounded-md">
                         <h2>{article.title}</h2>
@@ -20,7 +20,7 @@ export default async function Articles(){
                         <p>{article.createdAt}</p>
                     </div>
                 ))}
-            </div>
+            </div> */}
         </div>
     )
 }
