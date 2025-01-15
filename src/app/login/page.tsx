@@ -1,5 +1,6 @@
 'use client'
 
+import { redirect } from "next/navigation";
 import { useState } from "react";
 
 const LoginPage = () => {
@@ -28,7 +29,7 @@ const LoginPage = () => {
       localStorage.setItem('token', token);
 
       // Redirecionar para outra página após o login bem-sucedido
-      window.location.href = '/posts';
+      redirect('/posts')
     } catch (error: unknown) {
       // Verificar se o erro é uma instância de Error antes de acessar 'message'
       if (error instanceof Error) {
