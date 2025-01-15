@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 
 // Interface para definir o tipo do artigo
 interface Article {
@@ -9,7 +9,6 @@ interface Article {
     title: string;
     description: string;
     body: string;
-    userId?: number;  // ID do usuário que criou o artigo
     createdAt?: string;
 }
 
@@ -20,41 +19,29 @@ export default function Articles() {
         body: '',
     });
     const [articles, setArticles] = useState<Article[]>([]);
-    const [userId, setUserId] = useState<number | null>(null);
 
-    // Função para obter o ID do usuário autenticado
-    const getUserIdFromToken = useCallback(() => {
-        const token = localStorage.getItem("authToken");  // Supondo que o token esteja no localStorage
-        if (token) {
-            const payload = JSON.parse(atob(token.split('.')[1]));  // Decodifica o JWT
-            return payload.userId;  // Supondo que o JWT contenha o userId
-        }
-        return null;
+    useEffect(() => {
+        getArticles();
     }, []);
 
-    // Função para buscar artigos do usuário autenticado
-    const getArticles = useCallback(async () => {
+    async function getArticles() {
         try {
             const resp = await fetch('https://nestjs-backend-v9c5.onrender.com/articles');
             const articlesData: Article[] = await resp.json();
-            if (userId !== null) {
-                setArticles(articlesData.filter(article => article.userId === userId));  // Filtra artigos do usuário
-            }
+            setArticles(articlesData);
         } catch (error) {
             console.error("Erro ao buscar artigos:", error);
         }
-    }, [userId]);
+    }
 
-    // Função para criar um novo artigo
-    const createArticle = async () => {
+    async function createArticle() {
         try {
-            const newArticle = { ...article, userId };  // Inclui o userId ao criar o artigo
             await fetch('https://nestjs-backend-v9c5.onrender.com/articles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newArticle),
+                body: JSON.stringify(article),
             });
             setArticle({ title: '', description: '', body: '' });
             await getArticles();
@@ -63,8 +50,7 @@ export default function Articles() {
         }
     }
 
-    // Função para atualizar um artigo existente
-    const updateArticle = async () => {
+    async function updateArticle() {
         if (!article.id) return;
         try {
             await fetch(`https://nestjs-backend-v9c5.onrender.com/articles/${article.id}`, {
@@ -81,8 +67,7 @@ export default function Articles() {
         }
     }
 
-    // Função para excluir um artigo
-    const deleteArticle = async (id: number) => {
+    async function deleteArticle(id: number) {
         try {
             await fetch(`https://nestjs-backend-v9c5.onrender.com/articles/${id}`, {
                 method: 'DELETE',
@@ -93,8 +78,7 @@ export default function Articles() {
         }
     }
 
-    // Função para buscar artigo por ID para edição
-    const updateArticleById = async (id: number) => {
+    async function updateArticleById(id: number) {
         try {
             const res = await fetch(`https://nestjs-backend-v9c5.onrender.com/articles/${id}`);
             const articleData: Article = await res.json();
@@ -104,8 +88,7 @@ export default function Articles() {
         }
     }
 
-    // Renderiza o formulário de criação/edição de artigo
-    const renderFormArticle = () => {
+    function renderFormArticle() {
         return (
             <div className="grid grid-cols-3 gap-5 items-end">
                 <div className="flex flex-col">
@@ -153,8 +136,7 @@ export default function Articles() {
         );
     }
 
-    // Renderiza a lista de artigos
-    const renderArticles = () => {
+    function renderArticles() {
         return (
             <div>
                 <h1 className="flex items-center justify-center py-4 font-bold">Lista de artigos</h1>
@@ -173,14 +155,12 @@ export default function Articles() {
                                     <button
                                         onClick={() => deleteArticle(article.id!)}
                                         className="bg-red-600 p-2 rounded-md text-white"
-                                        disabled={article.userId !== userId}  // Desabilita o botão se não for o artigo do usuário
                                     >
                                         Excluir artigo
                                     </button>
                                     <button
                                         onClick={() => updateArticleById(article.id!)}
                                         className="bg-zinc-800 p-2 rounded-md text-white"
-                                        disabled={article.userId !== userId}  // Desabilita o botão se não for o artigo do usuário
                                     >
                                         Editar artigo
                                     </button>
@@ -192,13 +172,6 @@ export default function Articles() {
             </div>
         );
     }
-
-    // Executa a lógica de obter o userId e artigos ao carregar o componente
-    useEffect(() => {
-        const userId = getUserIdFromToken();
-        setUserId(userId);  // Define o userId do usuário autenticado
-        getArticles();
-    }, [getUserIdFromToken, getArticles]);
 
     return (
         <div className="flex flex-col justify-center items-center h-screen gap-10">
