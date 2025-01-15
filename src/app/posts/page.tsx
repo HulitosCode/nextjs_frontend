@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import Link from "next/link"
-import { useEffect, useState } from "react"
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 // Interface para definir o tipo do artigo
 interface Article {
