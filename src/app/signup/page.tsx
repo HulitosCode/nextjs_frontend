@@ -9,7 +9,7 @@ function Register() {
 
     const handleRegister = async () => {
         try {
-            const response = await fetch('http://localhost:8000/register', {
+            const response = await fetch('https://nestjs-backend-v9c5.onrender.com/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
