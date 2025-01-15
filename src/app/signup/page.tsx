@@ -2,9 +2,19 @@
 
 import React, { useState } from 'react';
 
+interface User {
+    id?: number;
+    name: string;
+    email: string;
+    password: string;
+}
+
 function Register() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [user, setUser] = useState<User>({
+        name: '',
+        email: '',
+        password: '',
+    });
     const [error, setError] = useState('');
 
     const handleRegister = async () => {
@@ -14,8 +24,9 @@ function Register() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify(handleRegister),
             });
+            setUser({ name: '', email: '', password: ''});
             const data = await response.json();
             if (response.ok) {
                 alert('Usuário registrado com sucesso!');
@@ -32,15 +43,17 @@ function Register() {
             <h2>Registro</h2>
             <input
                 type="text"
+                id='name'
                 placeholder="Nome de usuário"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={user.name}
+                onChange={(e) => setUser({ ...user, name: e.target.value})}
             />
             <input
                 type="password"
                 placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id='password'
+                value={user.password}
+                onChange={(e) => setUser({ ...user, password: e.target.value})}
             />
             <button onClick={handleRegister}>Registrar</button>
             {error && <p>{error}</p>}
